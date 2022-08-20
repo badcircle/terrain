@@ -1,0 +1,46 @@
+[gd_scene load_steps=8 format=3 uid="uid://tdnbmcd0sqeo"]
+
+[ext_resource type="Script" path="res://terrain/CharacterBody3D.gd" id="1_h7i7k"]
+[ext_resource type="PackedScene" uid="uid://cdnuouy7jn787" path="res://terrain/chunk.tscn" id="1_ski6r"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ttbns"]
+
+[sub_resource type="Sky" id="Sky_1ksna"]
+sky_material = SubResource("ProceduralSkyMaterial_ttbns")
+
+[sub_resource type="Environment" id="Environment_7awc2"]
+background_mode = 2
+sky = SubResource("Sky_1ksna")
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_sky_contribution = 0.3
+ambient_light_energy = 0.25
+tonemap_mode = 3
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_2m248"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2l2px"]
+
+[node name="preEnv" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_7awc2")
+
+[node name="sunlight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.630635, 0.776079, 0, -0.776079, 0.630635, 0, 5.32935, 0)
+
+[node name="terrain" parent="." instance=ExtResource("1_ski6r")]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.259, 0)
+script = ExtResource("1_h7i7k")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D"]
+mesh = SubResource("CapsuleMesh_2m248")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+shape = SubResource("CapsuleShape3D_2l2px")
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 0.937014, 0.349292, 0, -0.349292, 0.937014, 1, 1.521, 5.696)
