@@ -4,48 +4,74 @@ extends StaticBody3D
 var groundMap : Array
 
 @onready var colShape = $collision
-@export var colShapeSize = 26
-@export var colShapeSizeRatio = 1.0
-@export var heightRatio = 1.0
+@export var colShapeSize = 200
+@export var heightRatio = 7
 
-var img = Image.load_from_file("res://terrain/heightmaps/sample.jpg")
-var imgChunk
-var shape = HeightMapShape3D.new()
+@export var img : Image
+@export var noise : NoiseTexture
+@onready var mats = $ground.mesh.material
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	noise = NoiseTexture.new()
+	noise = load("res://terrain/heightmaps/land_mass_noise.tres")
+	await noise.changed
+	img = noise.get_image()
+	img.resize(colShapeSize, colShapeSize)
+	$ground.mesh.size = Vector2(colShapeSize, colShapeSize)
+	$ground.mesh.subdivide_width = colShapeSize - 2
+	$ground.mesh.subdivide_depth = colShapeSize - 2
+#	Create blank data lists
 	ground = ArrayMesh.new()
 	groundMap = $ground.mesh.surface_get_arrays(0)
-	groundMap[0] = Array()
-	ground.clear_surfaces()
-	
-	imgChunk = img.get_rect(Rect2i(0,0,333,333))
+	groundMap[0] = PackedVector3Array()
+
+#	Look at the correct chunk
+	var imgChunk = img
 	imgChunk.convert(Image.FORMAT_RF)
-	imgChunk.resize((colShapeSize + 1)*colShapeSizeRatio, (colShapeSize + 1)*colShapeSizeRatio)
-	
 	var w = imgChunk.get_width()
 	var h = imgChunk.get_height()
 	var data = imgChunk.get_data().to_float32_array()
-	for i in range(0, data.size()):
-		data[i] *= heightRatio
-		
+	var shapeData = PackedFloat32Array()
+
+#	Create data lists for heights of heightmap image
 	var k = 0
 	for y in range(0, h):
 		for x in range(0, w):
-			groundMap[0].append_array([x, data[k], y])
+			shapeData.push_back(data[k] * heightRatio)
+			groundMap[0].push_back(Vector3(x,shapeData[k],y))
 			k += 1
 	
-	var mdt = MeshDataTool.new()
-	mdt.create_from_surface($ground.mesh, 0)
-	ground.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, groundMap[0])
-	mdt.commit_to_surface(ground)
-	$ground.mesh = ground
-	
-	shape.map_width = colShapeSize + 1
-	shape.map_depth = colShapeSize + 1
-	shape.map_data = data
+	for d in range(groundMap[0].size(), data.size()):
+		data.remove_at(d)
+			
+	print(shapeData.size())
+	print(groundMap[0].size())
+	print(h)
+#	Set Collision Shape
+	var shape = HeightMapShape3D.new()
+	shape.map_width = w
+	shape.map_depth = h
+	shape.map_data = shapeData
 	colShape.shape = shape
 
+#	Add new ground mesh
+	var mdt = MeshDataTool.new()
+	ground.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, groundMap)
+	mdt.commit_to_surface(ground)
+	$ground.mesh = ground
+	$ground.mesh.surface_set_material(0, mats)
+	
+#	Generate correct shadows
+	var st = SurfaceTool.new()
+	st.create_from($ground.mesh, 0)
+	st.generate_normals()
+	st.generate_tangents()
+	st.commit($ground.mesh)
+	
+#	Move ground to correct position
+	$ground.position = Vector3(colShapeSize*-0.5,0,colShapeSize*-0.5)
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func _process(_delta):
 	pass

@@ -1,9 +1,18 @@
-[gd_scene load_steps=8 format=3 uid="uid://tdnbmcd0sqeo"]
+[gd_scene load_steps=12 format=3 uid="uid://tdnbmcd0sqeo"]
 
+[ext_resource type="Script" path="res://terrain/chunk.gd" id="1_7ycma"]
 [ext_resource type="Script" path="res://terrain/CharacterBody3D.gd" id="1_h7i7k"]
-[ext_resource type="PackedScene" uid="uid://cdnuouy7jn787" path="res://terrain/chunk.tscn" id="1_ski6r"]
+[ext_resource type="Image" uid="uid://c2n534gts2qvq" path="res://terrain/heightmaps/sample.jpg" id="2_33mtn"]
+[ext_resource type="PlaneMesh" uid="uid://cbonhs3wx1djy" path="res://terrain/grass.tres" id="2_h0x2u"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_g3iyu"]
+
+[sub_resource type="NoiseTexture" id="NoiseTexture_wpqsr"]
+seamless = true
+noise = SubResource("FastNoiseLite_g3iyu")
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_ttbns"]
+sky_cover = SubResource("NoiseTexture_wpqsr")
 
 [sub_resource type="Sky" id="Sky_1ksna"]
 sky_material = SubResource("ProceduralSkyMaterial_ttbns")
@@ -15,7 +24,7 @@ ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_sky_contribution = 0.3
 ambient_light_energy = 0.25
-tonemap_mode = 3
+tonemap_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_2m248"]
 
@@ -27,12 +36,24 @@ tonemap_mode = 3
 environment = SubResource("Environment_7awc2")
 
 [node name="sunlight" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.630635, 0.776079, 0, -0.776079, 0.630635, 0, 5.32935, 0)
+transform = Transform3D(1, 0, 0, 0, 0.852677, 0.522439, 0, -0.522439, 0.852677, 0, 5.32935, 0)
 
-[node name="terrain" parent="." instance=ExtResource("1_ski6r")]
+[node name="chunk1" type="StaticBody3D" parent="."]
+script = ExtResource("1_7ycma")
+img = ExtResource("2_33mtn")
+
+[node name="ground" type="MeshInstance3D" parent="chunk1"]
+mesh = ExtResource("2_h0x2u")
+
+[node name="collision" type="CollisionShape3D" parent="chunk1"]
+
+[node name="Camera3D2" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.257251, 0.966345, 0, -0.966345, 0.257251, 0, 40.8421, 0)
+current = true
+fov = 61.3
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.259, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 56.9646, 0)
 script = ExtResource("1_h7i7k")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D"]
@@ -43,4 +64,6 @@ skeleton = NodePath("../..")
 shape = SubResource("CapsuleShape3D_2l2px")
 
 [node name="Camera3D" type="Camera3D" parent="CharacterBody3D"]
-transform = Transform3D(1, 0, 0, 0, 0.937014, 0.349292, 0, -0.349292, 0.937014, 1, 1.521, 5.696)
+transform = Transform3D(1, 0, 0, 0, 0.937014, 0.349292, 0, -0.349292, 0.937014, 1, 1.521, 6.094)
+current = true
+far = 69.0

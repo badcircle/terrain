@@ -1,0 +1,23 @@
+[gd_resource type="NoiseTexture" load_steps=3 format=3 uid="uid://rlr0drmaev5h"]
+
+[sub_resource type="Gradient" id="Gradient_hgcgy"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_krqc6"]
+noise_type = 2
+seed = 5
+frequency = 0.001
+fractal_type = 2
+fractal_octaves = 6
+fractal_lacunarity = 1.8
+fractal_gain = 0.6
+domain_warp_enabled = true
+domain_warp_type = 2
+domain_warp_frequency = 0.04
+
+[resource]
+width = 999
+height = 999
+in_3d_space = true
+seamless = true
+color_ramp = SubResource("Gradient_hgcgy")
+noise = SubResource("FastNoiseLite_krqc6")

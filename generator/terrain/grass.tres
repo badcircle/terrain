@@ -1,0 +1,34 @@
+[gd_resource type="PlaneMesh" load_steps=5 format=3 uid="uid://cbonhs3wx1djy"]
+
+[sub_resource type="Gradient" id="Gradient_vhgul"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_xskev"]
+seed = 2
+frequency = 0.005
+fractal_type = 2
+fractal_octaves = 8
+fractal_lacunarity = 3.0
+fractal_gain = 0.3
+fractal_weighted_strength = 0.06
+
+[sub_resource type="NoiseTexture" id="NoiseTexture_cunxm"]
+width = 999
+height = 999
+in_3d_space = true
+seamless = true
+as_normal_map = true
+color_ramp = SubResource("Gradient_vhgul")
+noise = SubResource("FastNoiseLite_xskev")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1lvns"]
+diffuse_mode = 2
+specular_mode = 1
+albedo_color = Color(0.0941176, 0.462745, 0.101961, 1)
+normal_enabled = true
+normal_texture = SubResource("NoiseTexture_cunxm")
+anisotropy_enabled = true
+
+[resource]
+material = SubResource("StandardMaterial3D_1lvns")
+subdivide_width = 77
+subdivide_depth = 77
